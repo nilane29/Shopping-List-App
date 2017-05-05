@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="http://dev.jtsage.com/cdn/spinbox/latest/jqm-spinbox.min.js"></script>
+
+</head>
+<body>
+
+<script>
+
+var ChosenItems = {};
+
+
+
+$( document ).ready(function() {
+  
+    var q = localStorage.getItem("previousList");
+	if (q!=null) ChosenItems = JSON.parse(q);
+});
+
+
+
+function gotoQuantity(obj)
+{
+	$.mobile.changePage("#pageone");
+	ItemsChosen= $(obj).text();
+	$("#Items").text(ItemsChosen);
+
+}
+
+function addItemToList()
+{
+	var textinput= $(AddItem).val();
+	
+	var li = "<li>" +textinput+ "</li>";
+	$("#mainlist").append(li);
+}
+
+
+
+function ShowChosenItems()
+{
+	if ($("#spin").val()!="0")  SaveChoice();
+	//$("#AllItemsChosen").text(JSON.stringify(ChosenItems));
+	$("#ShoppingList").empty();
+
+	for (var key in ChosenItems) {
+    	//output += key + " -> " + ChosenItems[key] + "<hr/>";
+		ItemsData = key + ":" + ChosenItems[key]
+		;
+
+    	$('<li><input type="checkbox"/>').append('<a href=“#”>' + ItemsData + '</a><button onclick="DeleteChoice()"> Delete </button></li>').appendTo('#ShoppingList');
+
+    	
+	}
+
+	$.mobile.changePage("#pagetwo");
+	
+		$("#AllItemsChosen").listview('refresh');
+
+}
+
+function BackToList()
+{
+	SaveChoice();
+	$.mobile.changePage("#page");
+	$("#spin").val(0);
+}
+
+function SaveChoice()
+{
+	ItemsChosen= $("#Items").text();
+	QuantityChosen= $("#spin").val();
+	ChosenItems[ItemsChosen] = QuantityChosen;
+	localStorage.setItem("previousList",JSON.stringify(ChosenItems));
+}
+
+function DeleteChoice()
+{
+	$('#ChosenItems').parent().remove();
+}
+</script>
+
+<div data-role="page" id="page">
+	<div data-role="header">
+		<h1> Shopping list</h1>
+	</div>
+
+	<div data-role="main" class="ui-content">
+		<form class="ui-filterable">
+			New Item<input data-type="textinput" id="AddItem"/>
+			<button onclick="addItemToList()"> Add Item </button>
+    	<input id="myFilter" data-type="search" placeholder =" Search for food..">
+    	</form>
+		<ul id="mainlist" data-role="listview" data-inset="true" data-filter="true" data-input="#myFilter" data-autodividers="true"> 
+			<li><a onclick="gotoQuantity(this)">Apple</a></li>
+      		<li><a onclick="gotoQuantity(this)">Banana</a></li>
+      		<li><a onclick="gotoQuantity(this)">Cookies</a></li>
+      		<li><a onclick="gotoQuantity(this)">Detergent</a></li>
+      		<li><a onclick="gotoQuantity(this)">Milk</a></li>
+      		<li><a onclick="gotoQuantity(this)">Sugar</a></li>
+      		<li><a onclick="gotoQuantity(this)">Rice</a></li>
+		</ul>
+	</div>
+</div>
+
+<div data-role="page" id="pageone">
+	<div data-role="main" class="ui-content">
+		<div id="Items"> </div>
+		<div class="ui-field-contain">
+    		<label for="spin">Input spinner</label>
+    		<input type="text" data-role="spinbox" name="spin" id="spin" value="0" min="0" max="10"/>
+		</div>
+		<button onclick="BackToList()"> Choose Again </button>
+		<button onclick="ShowChosenItems()"> Show Chosen Items </button>
+	</div>
+</div>
+
+<div data-role="page" id="pagetwo">
+	<div data-role="main" class="ui-content">
+	<div id="AllItemsChosen">
+	<ul data-role="listview" data-inset="true" data-input="#myFilter" data-autodividers="true" data-inset="true" id="ShoppingList">
+	</ul>
+	<button onclick="$.mobile.changePage('#page');"> Back To List </button>
+	</div>
+	</div>
+
+</div>
+
+</body>
+</html>
